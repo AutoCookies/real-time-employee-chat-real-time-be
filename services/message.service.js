@@ -1,7 +1,6 @@
 // services/message.service.js
 import { db } from "../libs/firebase.js";
 import Message from "../models/message.model.js";
-import { io } from "../server.js";
 
 export const sendMessageService = async ({ chatId, from, to, content }) => {
     if (!chatId || !from || !content) {
