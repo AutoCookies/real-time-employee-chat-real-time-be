@@ -1,0 +1,1 @@
+Remember to add index for messages from firebase

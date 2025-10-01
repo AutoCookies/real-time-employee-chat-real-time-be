@@ -1,11 +1,12 @@
 class Message {
     // Message belongs to a chat
-    constructor({ chatId, from, to, content, timestamp }) {
+    constructor({ chatId, from, to, content, timestamp, seen }) {
         this.chatId = chatId;
         this.from = from;
         this.to = to;
         this.content = content;
         this.timestamp = timestamp;
+        this.seen = seen
     }
 
     toFirestore() {
@@ -14,7 +15,8 @@ class Message {
             from: this.from,
             to: this.to,
             content: this.content,
-            timestamp: this.timestamp
+            timestamp: this.timestamp,
+            seen: this.seen
         };
     }
 

@@ -136,18 +136,13 @@ export const getChatsByEmployeeIdService = async (employeeId) => {
 
         const chats = [];
 
-        // Hàm phụ lấy participant details
+        // Hàm phụ lấy participant details trực tiếp từ employeeId
         const getParticipantsDetail = async (participantIds) => {
             return Promise.all(
-                participantIds.map(async (accountId) => {
-                    const accountDoc = await db.collection("accounts").doc(accountId).get();
-                    if (!accountDoc.exists) return { id: accountId, name: "Unknown" };
-
-                    const empId = accountDoc.data().employeeId;
+                participantIds.map(async (empId) => {
                     const employeeDoc = await db.collection("employees").doc(empId).get();
-
                     return {
-                        id: accountId,
+                        id: empId,
                         name: employeeDoc.exists ? employeeDoc.data().name : "Unknown",
                     };
                 })

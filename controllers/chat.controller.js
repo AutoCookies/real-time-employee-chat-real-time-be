@@ -6,6 +6,7 @@ import {
 
 export const createChatController = async (req, res) => {
     try {
+        // Create with current user id and other employee Id
         const currentUserId = req.user.employeeId;
         const { otherId } = req.body; 
 
