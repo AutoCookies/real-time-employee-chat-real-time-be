@@ -8,7 +8,7 @@ import { io } from '../server.js'
 export const sendMessageController = async (req, res) => {
     try {
         const from = req.user.employeeId;
-        console.log(`CUrrent user: ${from}`)
+        // console.log(`CUrrent user: ${from}`)
         const { chatId, to, content } = req.body;
 
         const result = await sendMessageService({ chatId, from, to, content });

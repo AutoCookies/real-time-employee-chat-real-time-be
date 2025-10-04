@@ -2,16 +2,16 @@ import { db } from '../libs/firebase.js'
 import Chat from '../models/chat.model.js'
 
 /**
- * Tạo chat mới hoặc trả về chat đã tồn tại giữa các participants
- * @param {string[]} participants - danh sách account doc.id
- * @param {string} currentUserId - account doc.id của user hiện tại
+ * This function is for crreate a new chat form list of participants and current user signin the system.
+ * @param {string[]} participants - list of doc.id
+ * @param {string} currentUserId - account doc.id of existed user
  * @returns {Promise<{id: string, name: string, participantsDetail: Array<{id:string, name:string}>}>}
  */
 export const createChatService = async (participants, currentUserId) => {
     try {
         const now = new Date();
 
-        // 1. Kiểm tra chat đã tồn tại chưa
+        // 1. Check If chat existed?
         const snapshot = await db
             .collection("chats")
             .where("participants", "array-contains", participants[0])
@@ -28,7 +28,7 @@ export const createChatService = async (participants, currentUserId) => {
             }
         });
 
-        // 2. Lấy chi tiết participants (tên employee)
+        // 2. Get Employee Details means informations
         const getParticipantsDetail = async (participantIds) => {
             return Promise.all(
                 participantIds.map(async (accountId) => {
@@ -49,7 +49,7 @@ export const createChatService = async (participants, currentUserId) => {
         if (existingChat) {
             const participantsDetail = await getParticipantsDetail(existingChat.participants);
 
-            // Tự đặt name nếu null
+            // Put name, if has
             const chatName =
                 existingChat.name ||
                 participantsDetail
@@ -64,9 +64,9 @@ export const createChatService = async (participants, currentUserId) => {
             };
         }
 
-        // 3. Tạo chat mới
+        // 3. Create new chat object, with name null
         const newChat = new Chat({
-            name: null, // name sẽ tự tạo sau
+            name: null,
             participants,
             createdAt: now,
             updatedAt: now,
@@ -78,7 +78,7 @@ export const createChatService = async (participants, currentUserId) => {
 
         const participantsDetail = await getParticipantsDetail(chatData.participants);
 
-        // Tự đặt name nếu null: tên các participants khác currentUserId
+        // If name is null, get the participant names for Its name.
         const chatName =
             chatData.name ||
             participantsDetail
@@ -96,6 +96,11 @@ export const createChatService = async (participants, currentUserId) => {
     }
 };
 
+/**
+ * This function is for delete a chat with id
+ * @param {string} chatId id of chat
+ * @returns sucess and message
+ */
 export const deleteChatService = async (chatId) => {
     try {
         const chatRef = db.collection("chats").doc(chatId);
@@ -105,7 +110,7 @@ export const deleteChatService = async (chatId) => {
             throw new Error("Chat not found");
         }
 
-        // Xoá tất cả messages liên quan
+        // Delete all messages related to chat
         const messagesSnap = await db
             .collection("messages")
             .where("chatId", "==", chatId)
@@ -116,7 +121,7 @@ export const deleteChatService = async (chatId) => {
             batch.delete(doc.ref);
         });
 
-        // Xoá luôn chat
+        // Delete chat
         batch.delete(chatRef);
 
         await batch.commit();
@@ -127,6 +132,11 @@ export const deleteChatService = async (chatId) => {
     }
 };
 
+/**
+ * This function is for get all created chat of a user
+ * @param {string} employeeId 
+ * @returns list of chats
+ */
 export const getChatsByEmployeeIdService = async (employeeId) => {
     try {
         const snapshot = await db
@@ -136,7 +146,7 @@ export const getChatsByEmployeeIdService = async (employeeId) => {
 
         const chats = [];
 
-        // Hàm phụ lấy participant details trực tiếp từ employeeId
+        // Get participants details function
         const getParticipantsDetail = async (participantIds) => {
             return Promise.all(
                 participantIds.map(async (empId) => {
